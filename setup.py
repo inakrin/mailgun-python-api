@@ -2,10 +2,10 @@ from distutils.core import setup
 
 setup(name='mailgunapi-client',
       version='1.23',
-      description='Python Wrapper around MailGun HTTP API',
+      description='Python Wrapper around MailGun HTTP API Upgraded',
       author='Zach Goldberg',
       author_email='zach@zachgoldberg.com',
-      url='https://github.com/ZachGoldberg/mailgun-python-api',
+      url='https://github.com/betao-dev/mailgun-python-api',
       packages=[
           'mailgun',
           ],
