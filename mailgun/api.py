@@ -30,7 +30,7 @@ class RouteExpression(object):
 
 
 class MailgunAPI(object):
-    def __init__(self, api_key, api_list_name, test_mode=False,
+    def __init__(self, api_key, api_list_name=None, test_mode=False,
                  default_from_email=None):
         self.api_key = api_key
         self.api_list_name = api_list_name
@@ -104,6 +104,24 @@ class MailgunAPI(object):
 
         return response_json
 
+    def _retrieve_email_request(self, path):
+        response_json = None
+        success = False
+
+        try:
+            response = requests.get(path, auth=("api", self.api_key))
+            response_json = json.loads(response.content)
+            success = response.ok
+            reason = response_json.get('message')
+        except BaseException as error:
+            reason = error
+
+        if not success:
+            raise MailgunException(reason)
+
+        return response_json
+
+
     def send_email(self, subject,
                    plain_text, html_text, to_email,
                    from_email=None, cc=None, bcc=None,
@@ -135,6 +153,22 @@ class MailgunAPI(object):
             data["bcc"] = bcc
 
         return self._api_request("/%s/messages" % self.api_list_name, data)
+
+    def get_events(self, domain, data={}):
+        path = "/%s/events" % domain
+        return self._api_request("/%s/events" % domain, data, method="GET")
+
+    def retrieve_emails_for_inbox(self, email, data={}):
+        mails = []
+        data["recipient"] = email
+        domain = email.split('@')[1]
+        data["event"] = "accepted"
+        events = self.get_events(domain, data=data)
+        for event in events["items"]:
+            mail = self._retrieve_email_request(event['storage']["url"])
+            mails.append(mail)
+        return mails
+
 
     def send_bulk_email(self, subject,
                         plain_text, html_text, to_data,
@@ -209,8 +243,6 @@ class MailgunAPI(object):
         data = {}
         data["addresses"] = addresses
 
-    def get_events(self, data):
-        return self._api_request("/%s/events" % self.api_list_name, data,method="GET")
 
 
     def installPaging(self,js):        
