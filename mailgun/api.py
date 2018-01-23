@@ -110,7 +110,7 @@ class MailgunAPI(object):
         success = False
 
         try:
-            response = requests.get(path, auth=("api", self.api_key))
+            response = requests.get(path, auth=("api", self.api_key), verify=False)
             response_json = json.loads(response.content)
             success = response.ok
             reason = response_json.get('message')
@@ -255,7 +255,7 @@ class MailgunAPI(object):
 
 
     def _get(self,url):
-        response = requests.get(url,auth=("api", self.api_key))
+        response = requests.get(url,auth=("api", self.api_key), verify=False)
         js = json.loads(response.content)
         self.installPaging(js)
         return js
