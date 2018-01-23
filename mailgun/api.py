@@ -89,6 +89,7 @@ class MailgunAPI(object):
                     path, query_string),
                 auth=("api", self.api_key),
                 data=data,
+                verify=False
             )
 
             response_json = json.loads(response.content)
